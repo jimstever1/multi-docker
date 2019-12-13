@@ -1,0 +1,24 @@
+sudo: required
+services:
+    - docker
+
+before_install:
+    - docker build -t deskmonkey/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+    - docker run deskmonkey/react-test npm test -- --coverage
+
+after_success:
+    - docker build -t deskmonkey/multi-client ./client 
+    - docker build -t deskmonkey/multi-nginx ./nginx
+    - docker build -t deskmonkey/multi-server ./server
+    - docker build -t deskmonkey/multi-worker ./worker
+
+#Login to docker CLI
+    - echo "$DOCKER_PW" | docker login -u "$DOCKER_ID" --password-stdin
+
+#
+    - docker push deskmonkey/multi-client
+    - docker push deskmonkey/multi-nginx
+    - docker push deskmonkey/multi-server
+    - docker build deskmonkey/multi-worker
