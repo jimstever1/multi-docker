@@ -1,6 +1,6 @@
 {
     "AWSEBDockerrunVersion": 2,
-    "containderDefinintions": [
+    "containerDefinintions": [
         {
             "name": "client",
             "image": "deskmonkey/multi-client",
