@@ -2,12 +2,12 @@ language: generic
 sudo: required
 services:
     - docker
-addons:
-    apt:
-        update: true
-        packages:
-            - gnupg2
-            - pass
+#addons:
+    #apt:
+        #update: true
+        #packages:
+            #- gnupg2
+            #- pass
 
 before_install:
     - docker build -t deskmonkey/react-test -f ./client/Dockerfile.dev ./client
@@ -22,12 +22,25 @@ after_success:
     - docker build -t deskmonkey/multi-worker ./worker
 
 #Login to docker CLI
-    - mkdir ~/.docker
+    #- mkdir ~/.docker
     - echo $DOCKER_PW | docker login -u $DOCKER_ID --password-stdin
-    - cat ~/.docker/config.json
+    #- cat ~/.docker/config.json
 
 #Push to docker hub
     - docker push deskmonkey/multi-client
     - docker push deskmonkey/multi-nginx
     - docker push deskmonkey/multi-server
     - docker push deskmonkey/multi-worker
+
+deploy:
+    edge: true
+    provider: elasticbeanstalk
+    region: "us-west-2"
+    app: "muli-docker"
+    env: "MultiDocker-env"
+    bucket_name: "elasticbeanstalk-us-west-2-426568654543"
+    bucket_path: docker-multi
+    on:
+        branch: master
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
